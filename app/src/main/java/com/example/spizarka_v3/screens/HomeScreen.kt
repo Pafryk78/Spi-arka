@@ -22,11 +22,16 @@ import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Button
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -43,6 +48,15 @@ import com.example.spizarka_v3.product1
 fun HomeScreen( onClick: (String) -> Unit) {
     val viewModel: MainViewModel = viewModel()
     val products =  viewModel.getProducts().collectAsState(initial = emptyList())
+    var searchQuery by remember { mutableStateOf("")}
+
+    val filteredProducts = if (searchQuery.isBlank()) {
+        products.value
+    } else {
+        products.value.filter { product ->
+            product.name.contains(searchQuery, ignoreCase = true)
+        }
+    }
 
 
     Column {
@@ -52,6 +66,7 @@ fun HomeScreen( onClick: (String) -> Unit) {
                 .padding(16.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
+
             FloatingActionButton(onClick = { onClick("home") },
                 modifier = Modifier
                     .weight(1f)
@@ -59,6 +74,7 @@ fun HomeScreen( onClick: (String) -> Unit) {
                 ) {
                 Icon(imageVector = Icons.Filled.Home, contentDescription = null)
             }
+
             FloatingActionButton(onClick = { onClick("ListaZakupow") },
                 modifier = Modifier
                     .weight(1f)
@@ -67,10 +83,19 @@ fun HomeScreen( onClick: (String) -> Unit) {
                 Icon(imageVector = Icons.Filled.ShoppingCart, contentDescription = null)
             }
         }
+        OutlinedTextField(
+            value = searchQuery,
+            onValueChange = { searchQuery = it },
+            label = { Text("Wyszukaj produkt") },
+            modifier = Modifier.fillMaxWidth()
+        )
 
 
         Box(modifier = Modifier.fillMaxSize()) {
-            ProductList(products = products.value)
+
+
+
+            ProductList(filteredProducts=filteredProducts)
             FloatingActionButton(
                 modifier = Modifier
                     .padding(16.dp)
@@ -83,20 +108,22 @@ fun HomeScreen( onClick: (String) -> Unit) {
 }
 
 @Composable
-fun ProductList(products: List<Product>) {
+fun ProductList( filteredProducts: List<Product>) {
     Column(modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        ProductLazyColumn(products)
+        ProductLazyColumn(filteredProducts)
     }
 }
 
 @Composable
-fun ProductLazyColumn(products: List<Product>) {
+fun ProductLazyColumn(filteredProducts: List<Product>) {
     LazyColumn {
-        items(items = products, key = { it.uid }) {
+        items(items = filteredProducts, key = { it.uid }) {
                 product ->
             ProductRow(product)
+//        items(filteredProducts) { product ->
+//            Text(text = "${product.name} - ${product.quantity}")
         }
     }
 }

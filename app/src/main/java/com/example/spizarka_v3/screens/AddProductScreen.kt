@@ -30,6 +30,7 @@ fun AddProductScreen(
     var productName by remember { mutableStateOf("") }
     var productQuantity by remember { mutableStateOf("") }
 
+
     Column(
         modifier = Modifier
             .fillMaxSize()

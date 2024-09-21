@@ -14,17 +14,15 @@ import kotlinx.coroutines.launch
 class MainViewModel(app: Application) : AndroidViewModel(app) {
     private val repository = Repository(app.applicationContext)
 
-    private val _products = mutableStateListOf<Product>()
-    val products: List<Product> = _products
+
+
 
     fun addProduct(product: Product) {
         viewModelScope.launch {
             repository.addProduct(product)
-            _products.add(product)
+
         }
     }
-
-
 
 
     fun getProducts(): Flow<List<Product>> {

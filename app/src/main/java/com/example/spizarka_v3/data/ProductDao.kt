@@ -28,4 +28,10 @@ interface ProductDao {
     @Query("DELETE FROM products_table")
     suspend fun dropDatabase()
 
+    @Query("UPDATE products_table SET quantity = :newQuantity WHERE uid = :productId")
+    suspend fun updateQuantity(productId: Int, newQuantity: Int)
+
+    @Query("SELECT * FROM products_table WHERE name = :name")
+    suspend fun getProductByName(name: String): Product?
+
 }

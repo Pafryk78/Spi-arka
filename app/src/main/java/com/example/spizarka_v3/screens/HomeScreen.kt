@@ -17,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Button
@@ -95,7 +96,11 @@ fun HomeScreen( onClick: (String) -> Unit) {
 
 
 
-            ProductList(filteredProducts=filteredProducts)
+            ProductList(
+                filteredProducts = filteredProducts,
+                onIncreaseQuantity = { product -> viewModel.increaseProductQuantity(product) },
+                onDecreaseQuantity = { product -> viewModel.decreaseProductQuantity(product) }
+            )
             FloatingActionButton(
                 modifier = Modifier
                     .padding(16.dp)
@@ -108,20 +113,20 @@ fun HomeScreen( onClick: (String) -> Unit) {
 }
 
 @Composable
-fun ProductList( filteredProducts: List<Product>) {
+fun ProductList( filteredProducts: List<Product>,onIncreaseQuantity: (Product) -> Unit, onDecreaseQuantity: (Product) -> Unit) {
     Column(modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        ProductLazyColumn(filteredProducts)
+        ProductLazyColumn(filteredProducts,onIncreaseQuantity, onDecreaseQuantity)
     }
 }
 
 @Composable
-fun ProductLazyColumn(filteredProducts: List<Product>) {
+fun ProductLazyColumn(filteredProducts: List<Product>,onIncreaseQuantity: (Product) -> Unit, onDecreaseQuantity: (Product) -> Unit) {
     LazyColumn {
         items(items = filteredProducts, key = { it.uid }) {
                 product ->
-            ProductRow(product)
+            ProductRow(product,onIncreaseQuantity, onDecreaseQuantity)
 //        items(filteredProducts) { product ->
 //            Text(text = "${product.name} - ${product.quantity}")
         }
@@ -129,7 +134,7 @@ fun ProductLazyColumn(filteredProducts: List<Product>) {
 }
 
 @Composable
-fun ProductRow(product: Product) {
+fun ProductRow(product: Product, onIncreaseQuantity: (Product) -> Unit,onDecreaseQuantity: (Product) -> Unit) {
     Surface(modifier = Modifier
         .fillMaxWidth()
         .padding(3.dp),
@@ -147,15 +152,15 @@ fun ProductRow(product: Product) {
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 FloatingActionButton(
-                    onClick = { },
+                    onClick = { onDecreaseQuantity(product)},
                 ) {
-                    Icon(imageVector = Icons.Filled.ArrowDropDown, contentDescription = null)
+                    Icon(imageVector = Icons.Filled.KeyboardArrowDown, contentDescription = null)
                 }
                 Spacer(modifier = Modifier.width(25.dp))
                 Text(text = "Ilość: ${product.quantity}",fontSize = 15.sp)
                 Spacer(modifier = Modifier.width(25.dp))
                 FloatingActionButton(
-                    onClick = { },
+                    onClick = { onIncreaseQuantity(product) },
                 ) {
                     Icon(imageVector = Icons.Filled.KeyboardArrowUp, contentDescription = null)
                 }
@@ -168,9 +173,9 @@ fun ProductRow(product: Product) {
 
 
 
-@Preview(showBackground = true)
-@Composable
-fun ProductRowPreview() {
-    ProductRow(product = product1)
-}
+//@Preview(showBackground = true)
+//@Composable
+////fun ProductRowPreview() {
+////    ProductRow(product = product1)
+////}
 

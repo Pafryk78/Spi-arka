@@ -15,7 +15,22 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     private val repository = Repository(app.applicationContext)
 
 
+    fun increaseProductQuantity(product: Product) {
+        viewModelScope.launch {
+            val newQuantity = product.quantity + 1
+            repository.updateQuantity(product.uid, newQuantity)
+        }
+    }
 
+
+    fun decreaseProductQuantity(product: Product) {
+        viewModelScope.launch {
+            val newQuantity = product.quantity - 1
+            if (newQuantity >= 0) {
+                repository.updateQuantity(product.uid, newQuantity)
+            }
+        }
+    }
 
     fun addProduct(product: Product) {
         viewModelScope.launch {

@@ -32,17 +32,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.spizarka_v3.data.Product
 import com.example.spizarka_v3.screens.AddProductScreen
+import com.example.spizarka_v3.screens.CategoryScreen
 import com.example.spizarka_v3.screens.HomeScreen
 import com.example.spizarka_v3.screens.ListaZakupowScreen
 
 
 class MainActivity : ComponentActivity() {
     private val mainVm by viewModels<MainViewModel>()
+    private val screenViewModel by viewModels<ScreenViewModel>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -62,7 +65,24 @@ class MainActivity : ComponentActivity() {
                     AddProductScreen(onNavigateBack = { navController.popBackStack() })
 
                     }
+
+                composable("categoryScreen/{category}") { backStackEntry ->
+                    val category = backStackEntry.arguments?.getString("category")
+                    category?.let {
+                        CategoryScreen(category = it, onIncreaseQuantity = { product, quantityChange ->
+                            screenViewModel.updateProductQuantity(product, quantityChange)
+                        },
+                            onAddProductClick = { navController.navigate("AddProduct") }
+                        )
+                    }
                 }
+
+                }
+
+
+
+
+
 
 
             }

@@ -1,6 +1,8 @@
 package com.example.spizarka_v3.screens
 
 import androidx.activity.viewModels
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,6 +13,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -21,8 +25,10 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -41,8 +47,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.spizarka_v3.MainViewModel
+import com.example.spizarka_v3.ScreenViewModel
+import com.example.spizarka_v3.data.Category
 import com.example.spizarka_v3.data.Product
 import com.example.spizarka_v3.product1
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.ui.res.painterResource
 
 
 @Composable
@@ -50,7 +60,7 @@ fun HomeScreen( onClick: (String) -> Unit) {
     val viewModel: MainViewModel = viewModel()
     val products =  viewModel.getProducts().collectAsState(initial = emptyList())
     var searchQuery by remember { mutableStateOf("")}
-
+    val screenViewModel : ScreenViewModel = viewModel()
     val filteredProducts = if (searchQuery.isBlank()) {
         products.value
     } else {
@@ -58,6 +68,9 @@ fun HomeScreen( onClick: (String) -> Unit) {
             product.name.contains(searchQuery, ignoreCase = true)
         }
     }
+
+
+
 
 
     Column {
@@ -84,23 +97,22 @@ fun HomeScreen( onClick: (String) -> Unit) {
                 Icon(imageVector = Icons.Filled.ShoppingCart, contentDescription = null)
             }
         }
-        OutlinedTextField(
-            value = searchQuery,
-            onValueChange = { searchQuery = it },
-            label = { Text("Wyszukaj produkt") },
-            modifier = Modifier.fillMaxWidth()
-        )
+
+
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            modifier = Modifier.padding(16.dp)
+        ) {
+            items(screenViewModel.categories) { category ->
+                CategoryCard(category) {
+                    onClick("categoryScreen/${category.name}")
+                }
+            }
+        }
 
 
         Box(modifier = Modifier.fillMaxSize()) {
 
-
-
-            ProductList(
-                filteredProducts = filteredProducts,
-                onIncreaseQuantity = { product -> viewModel.increaseProductQuantity(product) },
-                onDecreaseQuantity = { product -> viewModel.decreaseProductQuantity(product) }
-            )
             FloatingActionButton(
                 modifier = Modifier
                     .padding(16.dp)
@@ -112,6 +124,39 @@ fun HomeScreen( onClick: (String) -> Unit) {
     }
 }
 
+@Composable
+fun CategoryCard(category: Category, onClick: () -> Unit) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .clickable { onClick() },
+
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        )
+        {
+            Image(
+            painter = painterResource(id = category.imageResId),
+            contentDescription = "Category Image"
+        )
+            Text(text = category.name)
+        }
+    }
+}
+
+
+
+
+
+
+
+
+//Lazy kolumn
 @Composable
 fun ProductList( filteredProducts: List<Product>,onIncreaseQuantity: (Product) -> Unit, onDecreaseQuantity: (Product) -> Unit) {
     Column(modifier = Modifier.fillMaxSize(),

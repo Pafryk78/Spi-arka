@@ -53,13 +53,13 @@ CoroutineScope(Dispatchers.IO).launch {
 
 
     }
-    private fun populateDatabase() {
-        repeat(20) {
-            val time = System.currentTimeMillis()
-            val product = Product(name = "Product ${time % 100}", quantity = 1)
-            CoroutineScope(viewModelScope.coroutineContext).launch {
-                repository.insertAll(listOf(product))
-            }
-        }
-    }
+//    private fun populateDatabase() {
+//        repeat(20) {
+//            val time = System.currentTimeMillis()
+//            val product = Product(name = "Product ${time % 100}", quantity = 1)
+//            CoroutineScope(viewModelScope.coroutineContext).launch {
+//                repository.insertAll(listOf(product))
+//            }
+//        }
+//    }
 }
